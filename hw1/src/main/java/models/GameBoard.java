@@ -69,6 +69,11 @@ public class GameBoard {
       }      
     }
     
+    if (this.winner != 0) {
+      // no need to continue to check draw
+      return;
+    }
+    
     this.isDraw = true;
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
