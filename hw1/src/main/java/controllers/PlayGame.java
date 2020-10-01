@@ -10,7 +10,7 @@ import models.Move;
 import models.Player;
 import org.eclipse.jetty.websocket.api.Session;
 
-class PlayGame {
+public class PlayGame {
 
   private static final int PORT_NUMBER = 8080;
   private static Gson gson = new Gson();
@@ -19,7 +19,9 @@ class PlayGame {
   private static Player p1;
   private static Player p2;
 
-  /** Main method of the application.
+  /**
+   * Main method of the application.
+   * 
    * @param args Command line arguments
    */
   public static void main(final String[] args) {
@@ -37,24 +39,25 @@ class PlayGame {
     app.get("/", ctx -> {
       ctx.redirect("/newgame");
     });
-    
+
     // Start a new game
     app.get("/newgame", ctx -> {
       gameboard = new GameBoard();
+      ctx.status(200); // OK
       ctx.redirect("/tictactoe.html");
     });
-    
+
     // Player 1 starts the game
     app.post("/startgame", ctx -> {
       String str = ctx.body();
       char type = str.charAt(str.length() - 1);
       p1 = new Player(type, 1);
-      
+
       gameboard.setPlayer1(p1);
       ctx.status(201); // created
       ctx.result(gson.toJson(gameboard));
     });
-    
+
     // Player 2 joins the game
     app.get("/joingame", ctx -> {
       char type = 'O';
@@ -63,11 +66,11 @@ class PlayGame {
       }
       p2 = new Player(type, 2);
       gameboard.setPlayer2(p2);
-      ctx.status(302); // redirected
+      ctx.status(200); // redirected
       ctx.redirect("/tictactoe.html?p=2");
       sendGameBoardToAllPlayers(gson.toJson(gameboard));
     });
-    
+
     // movement
     app.post("/move/:playerId", ctx -> {
       int id = Integer.parseInt(ctx.pathParam("playerId"));
@@ -82,7 +85,7 @@ class PlayGame {
       }
       String message = gameboard.validMove(move);
       System.out.println(message);
-      if (message != "") {
+      if (!message.equals("")) {
         Message mes = new Message(false, 100, message);
         ctx.result(gson.toJson(mes));
       } else {
@@ -94,12 +97,20 @@ class PlayGame {
       System.out.println(gameboard);
       sendGameBoardToAllPlayers(gson.toJson(gameboard));
     });
+    
+    // get the gameboard status
+    app.get("/gameboard", ctx -> {
+      ctx.status(200); // OK
+      ctx.result(gson.toJson(gameboard));
+    });
 
     // Web sockets - DO NOT DELETE or CHANGE
     app.ws("/gameboard", new UiWebSocket());
   }
 
-  /** Send message to all players.
+  /**
+   * Send message to all players.
+   * 
    * @param gameBoardJson Gameboard JSON
    * @throws IOException Websocket message send IO Exception
    */

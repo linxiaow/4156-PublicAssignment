@@ -18,4 +18,25 @@ public class Message {
     this.code = c;
     this.message = m;
   }
+  
+  /**.
+   * @return validity of the movement
+   */
+  public boolean getValidity() {
+    return this.moveValidity;
+  }
+  
+  /**.
+   * @return the response code
+   */
+  public int getCode() {
+    return this.code;
+  }
+  
+  /**.
+   * @return the message for the movement
+   */
+  public String getMessage() {
+    return this.message;
+  }
 }

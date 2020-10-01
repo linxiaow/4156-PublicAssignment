@@ -158,4 +158,38 @@ public class GameBoard {
     // when p2 is in, game starts
     this.gameStarted = true;
   }
+  
+  /** get the player 1 in board.*/
+  public Player getP1() {
+    return this.p1;
+  }
+  
+  /** get the player 2 in board.*/
+  public Player getP2() {
+    return this.p2;
+  }
+  
+  
+  /**.
+   * @return if the game started or not
+   */
+  public boolean getGameStatus() {
+    return this.gameStarted;
+  }
+  
+  
+  /**.
+   * @return if the game is a draw
+   */
+  public boolean isGameDraw() {
+    return this.isDraw;
+  }
+  
+  /**.
+   * @return the winner of the game
+   *        0 means no one wins
+   */
+  public int getWinner() {
+    return this.winner;
+  }
 }
