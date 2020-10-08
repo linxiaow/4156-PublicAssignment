@@ -9,6 +9,7 @@ import models.Message;
 import models.Move;
 import models.Player;
 import org.eclipse.jetty.websocket.api.Session;
+import utils.Database;
 
 public class PlayGame {
 
@@ -16,8 +17,7 @@ public class PlayGame {
   private static Gson gson = new Gson();
   private static Javalin app;
   private static GameBoard gameboard;
-  private static Player p1;
-  private static Player p2;
+  private static Database db;
 
   /**
    * Main method of the application.
@@ -26,6 +26,9 @@ public class PlayGame {
    */
   public static void main(final String[] args) {
 
+    gameboard = new GameBoard();
+    db = new Database();
+    db.recover(gameboard); // recover at the beginning
     app = Javalin.create(config -> {
       config.addStaticFiles("/public");
     }).start(PORT_NUMBER);
@@ -43,6 +46,9 @@ public class PlayGame {
     // Start a new game
     app.get("/newgame", ctx -> {
       gameboard = new GameBoard();
+      // re-create table
+      db.dropTable();
+      db.createTable();
       ctx.status(200); // OK
       ctx.redirect("/tictactoe.html");
     });
@@ -51,9 +57,11 @@ public class PlayGame {
     app.post("/startgame", ctx -> {
       String str = ctx.body();
       char type = str.charAt(str.length() - 1);
-      p1 = new Player(type, 1);
+      Player p1 = new Player(type, 1);
 
-      gameboard.setPlayer1(p1);
+      gameboard.setPlayer1(p1);      
+      // set p1 in db
+      db.addPlayers(p1);
       ctx.status(201); // created
       ctx.result(gson.toJson(gameboard));
     });
@@ -61,11 +69,15 @@ public class PlayGame {
     // Player 2 joins the game
     app.get("/joingame", ctx -> {
       char type = 'O';
+      Player p1 = gameboard.getP1();
       if (p1.getType() == 'O') {
         type = 'X';
       }
-      p2 = new Player(type, 2);
+      Player p2 = new Player(type, 2);
       gameboard.setPlayer2(p2);
+      // set p2 in db
+      db.addPlayers(p2);
+      
       ctx.status(200); // redirected
       ctx.redirect("/tictactoe.html?p=2");
       sendGameBoardToAllPlayers(gson.toJson(gameboard));
@@ -77,6 +89,8 @@ public class PlayGame {
       String str = ctx.body();
       int x = Character.getNumericValue(str.charAt(2));
       int y = Character.getNumericValue(str.charAt(6));
+      Player p1 = gameboard.getP1();
+      Player p2 = gameboard.getP2();
       Move move;
       if (id == 1) {
         move = new Move(p1, x, y);
@@ -89,12 +103,15 @@ public class PlayGame {
         Message mes = new Message(false, 100, message);
         ctx.result(gson.toJson(mes));
       } else {
-        // make movement
+        // make valid movement
         gameboard.makeMovement(move);
         Message mes = new Message(true, 100, "");
+        
+        //add valid move to db
+        db.addMove(move);
         ctx.result(gson.toJson(mes));
       }
-      System.out.println(gameboard);
+      System.out.println("make a move here");
       sendGameBoardToAllPlayers(gson.toJson(gameboard));
     });
     
@@ -117,6 +134,7 @@ public class PlayGame {
   private static void sendGameBoardToAllPlayers(final String gameBoardJson) {
     Queue<Session> sessions = UiWebSocket.getSessions();
     for (Session sessionPlayer : sessions) {
+      System.out.println("one here");
       try {
         sessionPlayer.getRemote().sendString(gameBoardJson);
       } catch (IOException e) {

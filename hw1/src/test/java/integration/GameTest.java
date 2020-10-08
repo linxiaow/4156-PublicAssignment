@@ -14,14 +14,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 // import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
+// import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 // import org.junit.jupiter.api.TestMethodOrder;
 
 //@TestMethodOrder(OrderAnnotation.class)
 class GameTest {
-
-  private static final String HttpResponse = null;
 
   /**
    * . Run only once before the game starts
@@ -525,7 +523,7 @@ class GameTest {
      *  X O X
      *  X O O
      *  O X X
-     *  and P1 should win
+     *  and draw
      *  
      * */
     Unirest.post("http://localhost:8080/move/1").body("x=0&y=0").asString();

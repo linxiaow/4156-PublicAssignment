@@ -20,22 +20,22 @@ public class Move {
   }
   
   /** get the x coordinate.*/
-  int getX() {
+  public int getX() {
     return moveX;
   }
   
   /** get the y coordinate.*/
-  int getY() {
+  public int getY() {
     return moveY;
   }
   
   /** get the player ID for the movement.*/
-  int getPlayerID() {
+  public int getPlayerID() {
     return player.getID();
   }
 
   /** get the player piece type for this movement.*/
-  char getPlayerType() {
+  public char getPlayerType() {
     return player.getType();
   }
 }

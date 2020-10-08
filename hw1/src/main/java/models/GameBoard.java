@@ -24,7 +24,7 @@ public class GameBoard {
    * if all spaces are occupied
    * then it is a draw
    */
-  private void update() {
+  public void update() {
     for (int i = 0; i < 3; i++) {
       if (boardState[i][0] == boardState[i][1] 
           && boardState[i][1] == boardState[i][2] 
@@ -101,6 +101,8 @@ public class GameBoard {
     this.winner = 0;
     this.gameStarted = false;
     this.isDraw = false;
+    this.p1 = null;
+    this.p2 = null;
   }
   
   /**
@@ -158,6 +160,11 @@ public class GameBoard {
     // when p2 is in, game starts
     this.gameStarted = true;
   }
+
+  /** get the whole board.*/
+  public GameBoard getBoard() {
+    return this;
+  }
   
   /** get the player 1 in board.*/
   public Player getP1() {
@@ -177,6 +184,13 @@ public class GameBoard {
     return this.gameStarted;
   }
   
+  /** .
+   * @param status yes or no: is game started
+   */
+  public void setGameStatus(boolean status) {
+    this.gameStarted = status;
+  }
+  
   
   /**.
    * @return if the game is a draw
@@ -191,5 +205,35 @@ public class GameBoard {
    */
   public int getWinner() {
     return this.winner;
+  }
+  
+  /**.
+   * @return the piece in a grid. Assume valid
+   */
+  public char getPiece(int row, int col) {
+    return this.boardState[row][col];
+  }
+  
+  /**.
+   * @return the current turn
+   */
+  public int getTurn() {
+    return this.turn;
+  }
+  
+  /**.
+   * @param row row number
+   * @param col column number
+   * @param type piece type
+   */
+  public void setPiece(int row, int col, char type) {
+    this.boardState[row][col] = type;
+  }
+  
+  /**.
+   * @param turn whose turn
+   */
+  public void setTurn(int turn) {
+    this.turn = turn;
   }
 }
